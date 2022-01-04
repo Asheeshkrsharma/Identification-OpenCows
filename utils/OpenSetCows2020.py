@@ -281,6 +281,7 @@ class OpenSetCows2020(data.Dataset):
 	(Effectively) private methods
 	"""
 
+    # Created by Asheesh Sharma
     def distribution(self):
         dt = self.getDistribution()
         unknown = self.getUnknown()
@@ -288,26 +289,30 @@ class OpenSetCows2020(data.Dataset):
         nums = []
         c = []
         for category, filepaths in dt:
-            cat.append(category)
+            cat.append('$C_{'+str(int(category))+'}$')
             nums.append(len(filepaths))
             if category in unknown:
-                c.append("r")
+                c.append("#de4a29")
             else:
-                c.append("b")
-        plt.bar(cat, nums, color=c)
+                c.append("#a278aa")
+        plt.bar(cat, nums, color=c,width = 0.8)
         plt.xticks(cat, cat)
-        plt.tick_params(rotation=60)
-        red_patch = mpatches.Patch(color="red", label="Unknown")
-        blue_patch = mpatches.Patch(color="blue", label="Known")
+        plt.tick_params(rotation=-45)
+        red_patch = mpatches.Patch(color="#de4a29", label="Unknown")
+        blue_patch = mpatches.Patch(color="#a278aa", label="Known")
         plt.title("Identification Instance Distribution")
         plt.xlabel("Class (Individual Animals)")
         plt.ylabel("Instances")
         plt.legend(handles=[red_patch, blue_patch])
-        plt.show()
+        # Titles and labels
+        plt.tight_layout(pad=0.9)
+        
+        plt.xlim(-0.4,45.4)
 
     def getUnknown(self):
         return self.__folds_dict[self.__fold]["unknown"]
 
+    # Created by Asheesh Sharma
     def plotSamples(self, num):
         for i in range(num):
             classID = randint(0, self.getNumClasses())
