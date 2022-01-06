@@ -166,7 +166,6 @@ class OpenSetCows2020(data.Dataset):
         # A dictionary storing separately the complete lists of filepaths for training and
         # testing
         self.__files = {}
-
         """
 		Class setup
 		"""
@@ -250,6 +249,7 @@ class OpenSetCows2020(data.Dataset):
             )
             label_anchor, label_neg = self.__transformLabels(label_anchor, label_neg)
 
+        label_anchor, label_neg = label_anchor.view(len(label_anchor)), label_neg.view(len(label_neg))
         return img_anchor, img_pos, img_neg, label_anchor, label_neg
 
     """
