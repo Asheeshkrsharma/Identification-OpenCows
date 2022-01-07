@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="99.82885mm"
-   height="292.80969mm"
-   viewBox="0 0 99.828842 292.80968"
+   width="96.653854mm"
+   height="294.39719mm"
+   viewBox="0 0 96.653847 294.39717"
    version="1.1"
    id="svg5"
    inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
@@ -27,15 +27,15 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.52172498"
-     inkscape:cx="475.34623"
-     inkscape:cy="674.68497"
+     inkscape:zoom="0.54912992"
+     inkscape:cx="43.705504"
+     inkscape:cy="1203.7224"
      inkscape:window-width="1312"
      inkscape:window-height="824"
      inkscape:window-x="84"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="g6895" />
   <defs
      id="defs2">
     <rect
@@ -199,7 +199,10 @@
        inkscape:export-ydpi="99.59761">
       <g
          id="g850"
-         transform="matrix(0.52660712,0,0,0.52660712,-694.06859,330.26448)">
+         transform="matrix(0.52660712,0,0,0.52660712,-694.06859,330.26448)"
+         inkscape:export-filename="/Users/as16542/OneDrive - University of Bristol/Repositories/Metric Learning Open Cows/staticAssets/Model.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96">
         <g
            id="g852">
           <path
@@ -225,13 +228,17 @@
       </g>
       <g
          id="g1696"
-         transform="matrix(0.52660712,0,0,0.52660712,-695.18164,327.00664)">
+         transform="matrix(0.52660712,0,0,0.52660712,-695.18164,327.00664)"
+         inkscape:export-filename="/Users/as16542/OneDrive - University of Bristol/Repositories/Metric Learning Open Cows/staticAssets/Model.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96">
         <g
            id="g1698">
           <path
              d="m 1408,-63 h -54 v 36 h 54 z"
              style="fill:#bcd6fc;fill-opacity:1;fill-rule:nonzero;stroke:#7c96bc;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             id="path1700" />
+             id="path1700"
+             sodipodi:nodetypes="ccccc" />
         </g>
         <text
            xml:space="preserve"
@@ -248,7 +255,10 @@
       <g
          id="g1738"
          transform="matrix(0.52660712,0,0,0.52660712,-695.05172,327.00664)"
-         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1">
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+         inkscape:export-filename="/Users/as16542/OneDrive - University of Bristol/Repositories/Metric Learning Open Cows/staticAssets/Model.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96">
         <g
            id="g1740"
            style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1">
@@ -269,7 +279,10 @@
       <g
          id="g1748"
          transform="matrix(0.52660712,0,0,0.52660712,-695.05172,327.00664)"
-         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1">
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+         inkscape:export-filename="/Users/as16542/OneDrive - University of Bristol/Repositories/Metric Learning Open Cows/staticAssets/Model.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96">
         <g
            id="g1750"
            style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1">
@@ -289,7 +302,10 @@
       </g>
       <g
          id="g34103"
-         transform="translate(-2.996954,-18.928391)">
+         transform="translate(-2.996954,-18.928391)"
+         inkscape:export-filename="/Users/as16542/OneDrive - University of Bristol/Repositories/Metric Learning Open Cows/staticAssets/Model.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96">
         <g
            id="g882"
            transform="matrix(0.52660712,0,0,0.52660712,-691.07164,344.26467)">
@@ -319,13 +335,16 @@
       </g>
       <g
          id="g34418"
-         transform="translate(-2.6916815,5.2916667)">
+         transform="translate(-5.8666817,6.8791668)"
+         inkscape:export-filename="/Users/as16542/OneDrive - University of Bristol/Repositories/Metric Learning Open Cows/staticAssets/Model.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96">
         <path
            style="fill:none;stroke:#000000;stroke-width:1.06134;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:4.24535, 4.24535;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#DotS-5);marker-end:url(#DotS-5)"
-           d="m 12.917271,320.52927 c 0,0 0,10.94458 0,10.94458 0,0 86.798734,0 86.798734,0 0,0 0,-10.94458 0,-10.94458"
+           d="m 23.711082,320.52927 c 0,0 0,10.94458 0,10.94458 0,0 76.004923,0 76.004923,0 0,0 0,-10.94458 0,-10.94458"
            id="path27257-4"
            inkscape:path-effect="#path-effect28909"
-           inkscape:original-d="m 12.917271,320.52927 v 10.94458 h 86.798734 v -10.94458"
+           inkscape:original-d="m 23.711082,320.52927 v 10.94458 h 76.004923 v -10.94458"
            sodipodi:nodetypes="cccc"
            inkscape:export-filename="/Users/as16542/OneDrive - University of Bristol/Repositories/Metric Learning Open Cows/staticAssets/Model.png"
            inkscape:export-xdpi="96"
@@ -333,7 +352,7 @@
         <text
            xml:space="preserve"
            style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold Italic';fill:#000000;fill-opacity:1;stroke-width:1.05967"
-           x="16.648853"
+           x="37.815521"
            y="328.19501"
            id="text29963-4"
            inkscape:export-filename="/Users/as16542/OneDrive - University of Bristol/Repositories/Metric Learning Open Cows/staticAssets/Model.png"
@@ -342,7 +361,7 @@
              sodipodi:role="line"
              id="tspan29961-9"
              style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:6.35px;font-family:Arial;-inkscape-font-specification:'Arial Bold Italic';fill:#000000;fill-opacity:1;stroke-width:1.05967"
-             x="16.648853"
+             x="37.815521"
              y="328.19501">TRAINED</tspan></text>
       </g>
       <g
@@ -442,7 +461,10 @@
         </g>
       </g>
       <g
-         id="g34210">
+         id="g34210"
+         inkscape:export-filename="/Users/as16542/OneDrive - University of Bristol/Repositories/Metric Learning Open Cows/staticAssets/Model.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96">
         <g
            id="g914"
            transform="matrix(0.52689114,0,0,0.52582633,6.7720165,140.71201)"
@@ -931,7 +953,10 @@
       </g>
       <g
          id="g6484"
-         transform="translate(-37.600881,-5.1343613)">
+         transform="translate(-37.600881,-5.1343613)"
+         inkscape:export-filename="/Users/as16542/OneDrive - University of Bristol/Repositories/Metric Learning Open Cows/staticAssets/Model.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96">
         <rect
            style="fill:#cfcfcf;stroke:#000000;stroke-width:0.527;stroke-linecap:square;stroke-linejoin:round"
            id="rect5998"
