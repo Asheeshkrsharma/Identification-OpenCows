@@ -6,6 +6,7 @@ import torch.utils.model_zoo as model_zoo
 import torchvision.models as models
 from torchvision import transforms
 from torch.utils.data.dataloader import default_collate
+from tqdm import tqdm
 
 # Usual math
 import numpy
@@ -39,7 +40,7 @@ def experiment(modelClass, foldFile, lRate=1e-5, decay=1e-4, momentum=0.9):
         nn.Module
     test: testing dataset
         nn.DataLoader
-    train: raining dataset 
+    train: raining dataset
         nn.DataLoader
     optimiser: Stochastic Gradient Descent optimiser
         nn.Optimizer
@@ -159,20 +160,35 @@ def inferAll(model, dataLoader, device, Num=200):
 
     outputEMBDs, labelEMBDS = numpy.zeros((1, 128)), numpy.zeros((1))
     breakStep = 0
-    for step, (images, _, _, labels, _) in enumerate(dataLoader):
-        embeddings, _ = model(images.to(device))
-        # Convert the data to numpy format
-        embeddings, labels = (
-            embeddings.data.cpu().numpy(),
-            labels.view(len(labels)).cpu().numpy(),
-        )
-        # Store testing data on this batch ready to be evaluated
-        outputEMBDs, labelEMBDS = numpy.concatenate(
-            (outputEMBDs, embeddings), axis=0
-        ), numpy.concatenate((labelEMBDS, labels), axis=0)
-        breakStep += len(labels)
-        if breakStep > Num:
-            break
+    model.eval()
+
+    if Num > 6000:
+      for images, _, _, labels, _ in tqdm(dataLoader):
+          embeddings, _ = model(images.to(device))
+          # Convert the data to numpy format
+          embeddings, labels = (
+              embeddings.data.cpu().numpy(),
+              labels.view(len(labels)).cpu().numpy(),
+          )
+          # Store testing data on this batch ready to be evaluated
+          outputEMBDs, labelEMBDS = numpy.concatenate(
+              (outputEMBDs, embeddings), axis=0
+          ), numpy.concatenate((labelEMBDS, labels), axis=0)
+    else:
+      for step, (images, _, _, labels, _) in enumerate(dataLoader):
+          embeddings, _ = model(images.to(device))
+          # Convert the data to numpy format
+          embeddings, labels = (
+              embeddings.data.cpu().numpy(),
+              labels.view(len(labels)).cpu().numpy(),
+          )
+          # Store testing data on this batch ready to be evaluated
+          outputEMBDs, labelEMBDS = numpy.concatenate(
+              (outputEMBDs, embeddings), axis=0
+          ), numpy.concatenate((labelEMBDS, labels), axis=0)
+          breakStep += len(labels)
+          if breakStep > Num:
+              break
     return outputEMBDs, labelEMBDS
 
 
