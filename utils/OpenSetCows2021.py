@@ -145,20 +145,41 @@ class OpenSetCows2021TrackLet(data.Dataset):
         return image
     
     def choose(self, choice, N):
-        X = random.randint(0, len(choice) - N)
+        X = random.randint(N, len(choice) - N)
         L = len(choice)
-        return [choice[i % L] if (i % L)<L else None for i in range(X, X+N)]
+        anchor = [choice[i % L] if (i % L)<L else None for i in range(X, X+N)]
+        positive = [choice[i % L] if (i % L)<L else None for i in range(X-N, X)]
+        return anchor, positive
 
     # Index retrieval method
     def __getitem__(self, index):
         sequence, label = self.dataset[index]['paths'], self.dataset[index]['label']
+        
         # Get a random yet temporally contgious set of images.
-        sequence = self.choose(sequence, self.maxSequenceLength)
-        sequence = [os.path.join(self.topDir, image) for image in sequence]
-        images = [self.loadImage(path) for path in sequence]
+        anchor, positive = self.choose(sequence, self.maxSequenceLength)
+        
+        # Get anchor
+        anchor = [os.path.join(self.topDir, image) for image in anchor]
+        anchor = [self.loadImage(path) for path in anchor]
 
+        # Get a postive sequence
+        positive = [os.path.join(self.topDir, image) for image in positive]
+        positive = [self.loadImage(path) for path in positive]
+
+        negative = None,
+        negativeLabel = None
+        # Should be quick enough
+        while(True):
+            exclusion = list(set(range(len(self.dataset))) - set([index]))
+            exclusion = random.choice(exclusion)
+            if self.dataset[exclusion]['label'] != label:
+                sequence, negativeLabel = self.dataset[exclusion]['paths'], self.dataset[exclusion]['label']
+                negative, _ = self.choose(sequence, self.maxSequenceLength)
+                negative = [os.path.join(self.topDir, image) for image in negative]
+                negative = [self.loadImage(path) for path in negative]
+                break
         # It is assumed that a sequences has single class
         # label = numpy.asarray([1]) * int(label)
         # label = torch.from_numpy(label).long()
 
-        return torch.stack(images), label
+        return torch.stack(anchor), torch.stack(positive), torch.stack(negative), label, negativeLabel
