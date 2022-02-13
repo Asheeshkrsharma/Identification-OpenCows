@@ -182,4 +182,4 @@ class OpenSetCows2021TrackLet(data.Dataset):
         # label = numpy.asarray([1]) * int(label)
         # label = torch.from_numpy(label).long()
 
-        return torch.stack(anchor), torch.stack(positive), torch.stack(negative), label, negativeLabel
+        return torch.stack(negative), torch.stack(anchor), torch.stack(positive), label, negativeLabel
