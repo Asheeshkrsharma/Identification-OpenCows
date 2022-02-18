@@ -88,7 +88,7 @@ class OpenSetCows2021(data.Dataset):
 class OpenSetCows2021TrackLet(data.Dataset):
     # Class constructor
     def __init__(
-        self, topDir, jsonPath, maxSequenceLength=5, combine=False, transform=False, img_size=(224, 224)
+        self, topDir, jsonPath, maxSequenceLength=None, combine=False, transform=False, img_size=(224, 224)
     ):
         self.img_size = img_size
         self.maxSequenceLength = maxSequenceLength
@@ -128,10 +128,6 @@ class OpenSetCows2021TrackLet(data.Dataset):
 
     # Transform the numpy images into pyTorch form
     def transformImages(self, img):
-        # Firstly, transform from NHWC -> NCWH
-        img = img.transpose(2, 0, 1)
-        # Now convert into pyTorch form
-        img = torch.from_numpy(img).float() / 255
         return self.t(img)
 
     # Get the number of items for this dataset (depending on the split)
@@ -140,8 +136,12 @@ class OpenSetCows2021TrackLet(data.Dataset):
     
     def loadImage(self, path):
         image = self.loadResizeImage(path)
+        # Firstly, transform from NHWC -> NCWH
+        image = image.transpose(2, 0, 1)
+        # Now convert into pyTorch form
+        image = torch.from_numpy(image).float() / 255
         if self.transform:
-            image = self.transformImages(image)
+            image = self.t(image)
         return image
     
     def choose(self, choice, N):
@@ -154,32 +154,36 @@ class OpenSetCows2021TrackLet(data.Dataset):
     # Index retrieval method
     def __getitem__(self, index):
         sequence, label = self.dataset[index]['paths'], self.dataset[index]['label']
-        
-        # Get a random yet temporally contgious set of images.
-        anchor, positive = self.choose(sequence, self.maxSequenceLength)
-        
-        # Get anchor
-        anchor = [os.path.join(self.topDir, image) for image in anchor]
-        anchor = [self.loadImage(path) for path in anchor]
+        if self.maxSequenceLength != None:
+          # Get a random yet temporally contgious set of images.
+          anchor, positive = self.choose(sequence, self.maxSequenceLength)
+          
+          # Get anchor
+          anchor = [os.path.join(self.topDir, image) for image in anchor]
+          anchor = [self.loadImage(path) for path in anchor]
 
-        # Get a postive sequence
-        positive = [os.path.join(self.topDir, image) for image in positive]
-        positive = [self.loadImage(path) for path in positive]
+          # Get a postive sequence
+          positive = [os.path.join(self.topDir, image) for image in positive]
+          positive = [self.loadImage(path) for path in positive]
 
-        negative = None,
-        negativeLabel = None
-        # Should be quick enough
-        while(True):
-            exclusion = list(set(range(len(self.dataset))) - set([index]))
-            exclusion = random.choice(exclusion)
-            if self.dataset[exclusion]['label'] != label:
-                sequence, negativeLabel = self.dataset[exclusion]['paths'], self.dataset[exclusion]['label']
-                negative, _ = self.choose(sequence, self.maxSequenceLength)
-                negative = [os.path.join(self.topDir, image) for image in negative]
-                negative = [self.loadImage(path) for path in negative]
-                break
-        # It is assumed that a sequences has single class
-        # label = numpy.asarray([1]) * int(label)
-        # label = torch.from_numpy(label).long()
+          negative = None,
+          negativeLabel = None
+          # Should be quick enough
+          while(True):
+              exclusion = list(set(range(len(self.dataset))) - set([index]))
+              exclusion = random.choice(exclusion)
+              if self.dataset[exclusion]['label'] != label:
+                  sequence, negativeLabel = self.dataset[exclusion]['paths'], self.dataset[exclusion]['label']
+                  negative, _ = self.choose(sequence, self.maxSequenceLength)
+                  negative = [os.path.join(self.topDir, image) for image in negative]
+                  negative = [self.loadImage(path) for path in negative]
+                  break
+          return torch.stack(negative), torch.stack(anchor), torch.stack(positive), label, negativeLabel
+        else:
+          anchor = [os.path.join(self.topDir, image) for image in sequence]
+          anchor = [self.loadImage(path) for path in anchor]
 
-        return torch.stack(negative), torch.stack(anchor), torch.stack(positive), label, negativeLabel
+          # It is assumed that a sequences has single class
+          # label = numpy.asarray([1]) * int(label)
+          # label = torch.from_numpy(label).long()
+          return torch.stack(anchor), label
