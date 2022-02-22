@@ -145,10 +145,23 @@ class OpenSetCows2021TrackLet(data.Dataset):
         return image
     
     def choose(self, choice, N):
-        X = random.randint(N, len(choice) - N)
+        # There can be a case where, Length of the sequence
+        # is less than N. In that case, our strategy would
+        # be to shuffle the sequence.
         L = len(choice)
-        anchor = [choice[i % L] if (i % L)<L else None for i in range(X, X+N)]
-        positive = [choice[i % L] if (i % L)<L else None for i in range(X-N, X)]
+        if L < N:
+          X = random.randint(0, L)
+          positive = [choice[i % L] for i in range(X, X+N)]
+          random.shuffle(choice)
+          anchor = [choice[i % L] for i in range(X, X+N)]
+        else:
+          S = len(choice) - N
+          if S < N:
+            X = random.randint(S, N)
+          else:
+            X = random.randint(N, S)
+          anchor = [choice[i % L] if (i % L)<L else None for i in range(X, X+N)]
+          positive = [choice[i % L] if (i % L)<L else None for i in range(X-N, X)]
         return anchor, positive
 
     # Index retrieval method
