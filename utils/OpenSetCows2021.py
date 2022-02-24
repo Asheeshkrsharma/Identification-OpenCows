@@ -88,7 +88,7 @@ class OpenSetCows2021(data.Dataset):
 class OpenSetCows2021TrackLet(data.Dataset):
     # Class constructor
     def __init__(
-        self, topDir, jsonPath, maxSequenceLength=None, combine=False, transform=False, img_size=(224, 224)
+        self, topDir, jsonPath, split='train', maxSequenceLength=None, combine=False, transform=False, img_size=(224, 224)
     ):
         self.img_size = img_size
         self.maxSequenceLength = maxSequenceLength
@@ -96,7 +96,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
         self.topDir = topDir
         with open(jsonPath) as f:
             files = json.load(f)
-            self.dataset = files['train']
+            self.dataset = files[split]
         self.t = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
