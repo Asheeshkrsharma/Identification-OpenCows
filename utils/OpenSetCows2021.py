@@ -88,15 +88,20 @@ class OpenSetCows2021(data.Dataset):
 class OpenSetCows2021TrackLet(data.Dataset):
     # Class constructor
     def __init__(
-        self, topDir, jsonPath, split='train', maxSequenceLength=None, combine=False, transform=False, img_size=(224, 224)
+        self, topDir, jsonPath, split='train', trackletChoiceProb = 0.5, maxSequenceLength=None, combine=False, transform=False, img_size=(224, 224)
     ):
         self.img_size = img_size
         self.maxSequenceLength = maxSequenceLength
         self.transform = transform
         self.topDir = topDir
+        self.prob = trackletChoiceProb
         with open(jsonPath) as f:
             files = json.load(f)
             self.dataset = files[split]
+            self.lookup = {item['label']:[] for item in self.dataset}
+            for i in range(len(self.dataset)):
+                self.lookup[self.dataset[i]['label']].append(i)
+
         self.t = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
@@ -164,6 +169,12 @@ class OpenSetCows2021TrackLet(data.Dataset):
           positive = [choice[i % L] if (i % L)<L else None for i in range(X-N, X)]
         return anchor, positive
 
+    def getSubset(self, category, index):
+        candidates = self.lookup[category]
+        candidates = list(set(candidates) - set([index]))
+        candidates = random.choice(candidates) 
+        return candidates
+
     # Index retrieval method
     def __getitem__(self, index):
         sequence, label = self.dataset[index]['paths'], self.dataset[index]['label']
@@ -171,6 +182,15 @@ class OpenSetCows2021TrackLet(data.Dataset):
           # Get a random yet temporally contgious set of images.
           anchor, positive = self.choose(sequence, self.maxSequenceLength)
           
+          if random.random() < self.prob:
+                try:
+                  positiveTemp = self.getSubset(label, index)
+                  print(positiveTemp, index)
+                  positiveTemp = self.dataset[positiveTemp]['paths']
+                  _, positive = self.choose(positiveTemp, self.maxSequenceLength)
+                except IndexError:
+                  pass
+
           # Get anchor
           anchor = [os.path.join(self.topDir, image) for image in anchor]
           anchor = [self.loadImage(path) for path in anchor]
