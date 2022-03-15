@@ -185,7 +185,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
           if random.random() < self.prob:
                 try:
                   positiveTemp = self.getSubset(label, index)
-                  print(positiveTemp, index)
+                  # print(positiveTemp, index)
                   positiveTemp = self.dataset[positiveTemp]['paths']
                   _, positive = self.choose(positiveTemp, self.maxSequenceLength)
                 except IndexError:
