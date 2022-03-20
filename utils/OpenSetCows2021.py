@@ -88,11 +88,11 @@ class OpenSetCows2021(data.Dataset):
 class OpenSetCows2021TrackLet(data.Dataset):
     # Class constructor
     def __init__(
-        self, topDir, jsonPath, split='train', trackletChoiceProb = 0.5, maxSequenceLength=None, combine=False, transform=False, img_size=(224, 224)
+        self, topDir, jsonPath, split='train', trackletChoiceProb = 0.5, maxSequenceLength=None, combine=False, transform=None, img_size=(224, 224)
     ):
         self.img_size = img_size
         self.maxSequenceLength = maxSequenceLength
-        self.transform = transform
+        self.transform = True if transform != None else False
         self.topDir = topDir
         self.prob = trackletChoiceProb
         with open(jsonPath) as f:
@@ -101,10 +101,12 @@ class OpenSetCows2021TrackLet(data.Dataset):
             self.lookup = {item['label']:[] for item in self.dataset}
             for i in range(len(self.dataset)):
                 self.lookup[self.dataset[i]['label']].append(i)
-
-        self.t = transforms.Normalize(
-            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-        )
+        
+        if transform != None:
+            self.t = transform
+            # self.t = transforms.Normalize(
+            #     mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+            # )
 
     # Load an image into memory, pad it to img size with a black background
     def loadResizeImage(self, img_path):
