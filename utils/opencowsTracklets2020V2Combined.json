@@ -1,5 +1,7 @@
 {
-    "test": [
+    "test": [],
+    "train": [
+
         {
             "label": 1,
             "paths": [
@@ -601,9 +603,7 @@
                 "identification/images/test/019/000001.jpg",
                 "identification/images/test/019/000004.jpg"
             ]
-        }
-    ],
-    "train": [
+        },
         {
             "paths": [
                 "identification/images/train/009/000056.jpg",
