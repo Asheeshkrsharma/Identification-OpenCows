@@ -88,13 +88,14 @@ class OpenSetCows2021(data.Dataset):
 class OpenSetCows2021TrackLet(data.Dataset):
     # Class constructor
     def __init__(
-        self, topDir, jsonPath, split='train', trackletChoiceProb = 0.5, maxSequenceLength=None, combine=False, transform=None, img_size=(224, 224)
+        self, topDir, jsonPath, split='train', eval=False, trackletChoiceProb = 0.5, maxSequenceLength=None, combine=False, transform=None, img_size=(224, 224)
     ):
         self.img_size = img_size
         self.maxSequenceLength = maxSequenceLength
         self.transform = True if transform != None else False
         self.topDir = topDir
         self.prob = trackletChoiceProb
+        self.eval = eval
         with open(jsonPath) as f:
             files = json.load(f)
             self.dataset = files[split]
@@ -139,7 +140,9 @@ class OpenSetCows2021TrackLet(data.Dataset):
 
     # Get the number of items for this dataset (depending on the split)
     def __len__(self):
-        return len(self.dataset)
+        if self.eval==True:
+            return len(self.dataset)
+        return len(self.lookup)
     
     def loadImage(self, path):
         image = self.loadResizeImage(path)
@@ -179,7 +182,13 @@ class OpenSetCows2021TrackLet(data.Dataset):
 
     # Index retrieval method
     def __getitem__(self, index):
+        # During evaluation, we need to consider all the tracklets in the dataset
+        if self.eval==False:
+            # Get the sequence using lookup
+            indeces = self.lookup[index] # Returns indeces of a class in the dataset
+            index = random.choice(indeces) # Choose a sequence from the list
         sequence, label = self.dataset[index]['paths'], self.dataset[index]['label']
+
         if self.maxSequenceLength != None:
           # Get a random yet temporally contgious set of images.
           anchor, positive = self.choose(sequence, self.maxSequenceLength)
