@@ -97,12 +97,13 @@ class OpenSetCows2021TrackLet(data.Dataset):
         self.prob = trackletChoiceProb
         self.eval = eval
         with open(jsonPath) as f:
-            files = json.load(f)
+            files = json.load(f)            
             self.dataset = files[split]
             self.lookup = {item['label']:[] for item in self.dataset}
             for i in range(len(self.dataset)):
                 self.lookup[self.dataset[i]['label']].append(i)
-        
+            self.classWeights = self.__getClassWeights(files)
+
         if transform != None:
             self.t = transform
             # self.t = transforms.Normalize(
@@ -137,6 +138,17 @@ class OpenSetCows2021TrackLet(data.Dataset):
     # Transform the numpy images into pyTorch form
     def transformImages(self, img):
         return self.t(img)
+
+    def __getClassWeights(self, dataSet):
+        classFrequency = numpy.zeros(self.__len__())
+        for track in dataSet['train']:
+            classFrequency[track['label']] += len(track['paths'])
+        for track in dataSet['test']:
+            classFrequency[track['label']] += len(track['paths'])
+        
+        weights = (1 / classFrequency / sum(classFrequency))
+        weights = weights / numpy.linalg.norm(weights)
+        return weights
 
     # Get the number of items for this dataset (depending on the split)
     def __len__(self):
