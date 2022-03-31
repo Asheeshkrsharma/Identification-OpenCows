@@ -141,12 +141,11 @@ class OpenSetCows2021TrackLet(data.Dataset):
         return self.t(img)
 
     def __getClassWeights(self, dataSet):
-        classFrequency = numpy.zeros(self.__len__())
+        classFrequency = numpy.zeros(len(self.lookup))
         for track in dataSet['train']:
             classFrequency[track['label']] += len(track['paths'])
         for track in dataSet['test']:
             classFrequency[track['label']] += len(track['paths'])
-        
         weights = (1 / classFrequency / sum(classFrequency))
         weights = weights / numpy.linalg.norm(weights)
         return weights
