@@ -88,7 +88,7 @@ class OpenSetCows2021(data.Dataset):
 class OpenSetCows2021TrackLet(data.Dataset):
     # Class constructor
     def __init__(
-        self, topDir, jsonPath, split='train', eval=False, trackletChoiceProb = 0.5, maxSequenceLength=None, combine=False, transform=None, img_size=(224, 224)
+        self, topDir, jsonPath, batchSize=0, split='train', eval=False, trackletChoiceProb = 0.5, maxSequenceLength=None, combine=False, transform=None, img_size=(224, 224)
     ):
         self.img_size = img_size
         self.maxSequenceLength = maxSequenceLength
@@ -96,6 +96,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
         self.topDir = topDir
         self.prob = trackletChoiceProb
         self.eval = eval
+        self.batchSize = batchSize
         with open(jsonPath) as f:
             files = json.load(f)            
             self.dataset = files[split]
@@ -154,7 +155,8 @@ class OpenSetCows2021TrackLet(data.Dataset):
     def __len__(self):
         if self.eval==True:
             return len(self.dataset)
-        return len(self.lookup)
+        else:
+            return max(len(self.lookup), self.batchSize)
     
     def loadImage(self, path):
         image = self.loadResizeImage(path)
@@ -196,6 +198,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
     def __getitem__(self, index):
         # During evaluation, we need to consider all the tracklets in the dataset
         if self.eval==False:
+            index = index % len(self.lookup)
             # Get the sequence using lookup
             indeces = self.lookup[index] # Returns indeces of a class in the dataset
             index = random.choice(indeces) # Choose a sequence from the list
