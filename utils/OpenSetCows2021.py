@@ -142,12 +142,17 @@ class OpenSetCows2021TrackLet(data.Dataset):
 
     def __getClassWeights(self, dataSet):
         classFrequency = numpy.zeros(len(self.lookup))
+        # for track in dataSet['train']:
+        #     classFrequency[track['label']] += len(track['paths'])
+        # for track in dataSet['test']:
+        #     classFrequency[track['label']] += len(track['paths'])
+        # weights = (1 / classFrequency / sum(classFrequency))
+        # weights = weights / numpy.linalg.norm(weights)
         for track in dataSet['train']:
-            classFrequency[track['label']] += len(track['paths'])
+            classFrequency[track['label']] += 1
         for track in dataSet['test']:
-            classFrequency[track['label']] += len(track['paths'])
-        weights = (1 / classFrequency / sum(classFrequency))
-        weights = weights / numpy.linalg.norm(weights)
+            classFrequency[track['label']] += 1
+        weights = sum(classFrequency) / (classFrequency * len(self.lookup))
         return weights
 
     # Get the number of items for this dataset (depending on the split)
