@@ -103,8 +103,8 @@ class OpenSetCows2021TrackLet(data.Dataset):
             self.lookup = {item['label']:[] for item in self.dataset}
             for i in range(len(self.dataset)):
                 self.lookup[self.dataset[i]['label']].append(i)
-            self.classWeights = self.__getClassWeights(files)
-
+            self.classWeights, self.classFrequency = self.__getClassWeights(files)
+        self.numClasses = len(self.lookup)
         if transform != None:
             self.t = transform
             # self.t = transforms.Normalize(
@@ -153,7 +153,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
         for track in dataSet['test']:
             classFrequency[track['label']] += 1
         weights = sum(classFrequency) / (classFrequency * len(self.lookup))
-        return weights
+        return weights, classFrequency
 
     # Get the number of items for this dataset (depending on the split)
     def __len__(self):
