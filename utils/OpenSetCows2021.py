@@ -172,7 +172,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
             image = self.t(image)
         return image
     
-    def choose(self, choice, N):
+    def choose(self, choice, N, shuffle=False):
         # There can be a case where, Length of the sequence
         # is less than N. In that case, our strategy would
         # be to shuffle the sequence.
@@ -190,6 +190,9 @@ class OpenSetCows2021TrackLet(data.Dataset):
             X = random.randint(N, S)
           anchor = [choice[i % L] if (i % L)<L else None for i in range(X, X+N)]
           positive = [choice[i % L] if (i % L)<L else None for i in range(X-N, X)]
+        
+        if shuffle == True:
+            random.shuffle(positive)
         return anchor, positive
 
     def getSubset(self, category, index):
@@ -198,55 +201,125 @@ class OpenSetCows2021TrackLet(data.Dataset):
         candidates = random.choice(candidates) 
         return candidates
 
+    def retrieve(self, paths):
+        images = [os.path.join(self.topDir, image) for image in paths]
+        return [self.loadImage(path) for path in images]
+
     # Index retrieval method
-    def __getitem__(self, index):
-        # During evaluation, we need to consider all the tracklets in the dataset
-        if self.eval==False:
-            index = index % len(self.lookup)
-            # Get the sequence using lookup
-            indeces = self.lookup[index] # Returns indeces of a class in the dataset
-            index = random.choice(indeces) # Choose a sequence from the list
-        sequence, label = self.dataset[index]['paths'], self.dataset[index]['label']
+    def __getitem__(self, categories):
+        # Sampler is going to return a tuple of category
+        # We have to get a random index for each category
+        # in the dataset
+        try:
+            catPos, catNeg = categories
+            # Choose from indeces of a class in the dataset
+            indexAnchor = random.choice(self.lookup[catPos]) 
+            indexNeg = random.choice(self.lookup[catNeg])
+        except TypeError as te:
+            # Probably we are evaluating, in that case,
+            # we just need to process one label
+            if self.eval==False:
+                # This means the dataloader return a sequence index
+                # not a category.
+                catPos = categories % len(self.lookup)
+                indexAnchor = random.choice(self.lookup[catPos])
+            else:
+                catPos = self.dataset[categories]['label']
+                indexAnchor = categories
 
+            # And choose any random negative category
+            catNeg = random.choice(list(set(range(len(self.lookup))) - set([catPos])))
+            indexNeg = random.choice(self.lookup[catNeg])
+
+        # If max sequence length is specified, we are training
         if self.maxSequenceLength != None:
-          # Get a random yet temporally contgious set of images.
-          anchor, positive = self.choose(sequence, self.maxSequenceLength)
-          
-          if random.random() < self.prob:
-                try:
-                  positiveTemp = self.getSubset(label, index)
-                  # print(positiveTemp, index)
-                  positiveTemp = self.dataset[positiveTemp]['paths']
-                  _, positive = self.choose(positiveTemp, self.maxSequenceLength)
-                except IndexError:
-                  pass
+            # By chance select a part of the same sequence to make
+            # the positive and anchor samples.
+            if random.random() >= self.prob:
+                # Choose different sequences
+                indexPos = self.getSubset(catPos, indexAnchor)
+                _, positive = self.choose(
+                    self.dataset[indexPos]['paths'],
+                    self.maxSequenceLength
+                )
+                anchor, _ = self.choose(
+                    self.dataset[indexAnchor]['paths'],
+                    self.maxSequenceLength
+                )
+                assert indexPos != indexAnchor
+            else:
+                # Choose part of the same sequence
+                sequence = self.dataset[indexAnchor]['paths']
+                anchor, positive = self.choose(
+                    sequence, self.maxSequenceLength, shuffle=True)
 
-          # Get anchor
-          anchor = [os.path.join(self.topDir, image) for image in anchor]
-          anchor = [self.loadImage(path) for path in anchor]
+            # Next choose a negative sample
+            sequence = self.dataset[indexNeg]['paths']
+            negative, _ = self.choose(sequence, self.maxSequenceLength)
 
-          # Get a postive sequence
-          positive = [os.path.join(self.topDir, image) for image in positive]
-          positive = [self.loadImage(path) for path in positive]
+            anchor, positive, negative = (
+                self.retrieve(anchor),
+                self.retrieve(positive),
+                self.retrieve(negative)
+            )
 
-          negative = None,
-          negativeLabel = None
-          # Should be quick enough
-          while(True):
-              exclusion = list(set(range(len(self.dataset))) - set([index]))
-              exclusion = random.choice(exclusion)
-              if self.dataset[exclusion]['label'] != label:
-                  sequence, negativeLabel = self.dataset[exclusion]['paths'], self.dataset[exclusion]['label']
-                  negative, _ = self.choose(sequence, self.maxSequenceLength)
-                  negative = [os.path.join(self.topDir, image) for image in negative]
-                  negative = [self.loadImage(path) for path in negative]
-                  break
-          return torch.stack(negative), torch.stack(anchor), torch.stack(positive), label, negativeLabel
+            return torch.stack(negative), torch.stack(anchor), torch.stack(positive), catPos, catNeg
         else:
-          anchor = [os.path.join(self.topDir, image) for image in sequence]
-          anchor = [self.loadImage(path) for path in anchor]
+            # If max sequence length is not specified, we are evaluating
+            sequence = self.dataset[indexAnchor]['paths']
+            anchor = [os.path.join(self.topDir, image) for image in sequence]
+            anchor = [self.loadImage(path) for path in anchor]
+            return torch.stack(anchor), catPos
 
-          # It is assumed that a sequences has single class
-          # label = numpy.asarray([1]) * int(label)
-          # label = torch.from_numpy(label).long()
-          return torch.stack(anchor), label
+    # Index retrieval method
+    # def __getitem__(self, index):
+    #     # During evaluation, we need to consider all the tracklets in the dataset
+    #     if self.eval==False:
+    #         index = index % len(self.lookup)
+    #         # Get the sequence using lookup
+    #         indeces = self.lookup[index] # Returns indeces of a class in the dataset
+    #         index = random.choice(indeces) # Choose a sequence from the list
+    #     sequence, label = self.dataset[index]['paths'], self.dataset[index]['label']
+
+    #     if self.maxSequenceLength != None:
+    #       # Get a random yet temporally contgious set of images.
+    #       anchor, positive = self.choose(sequence, self.maxSequenceLength)
+          
+    #       if random.random() < self.prob:
+    #             try:
+    #               positiveTemp = self.getSubset(label, index)
+    #               # print(positiveTemp, index)
+    #               positiveTemp = self.dataset[positiveTemp]['paths']
+    #               _, positive = self.choose(positiveTemp, self.maxSequenceLength)
+    #             except IndexError:
+    #               pass
+
+    #       # Get anchor
+    #       anchor = [os.path.join(self.topDir, image) for image in anchor]
+    #       anchor = [self.loadImage(path) for path in anchor]
+
+    #       # Get a postive sequence
+    #       positive = [os.path.join(self.topDir, image) for image in positive]
+    #       positive = [self.loadImage(path) for path in positive]
+
+    #       negative = None,
+    #       negativeLabel = None
+    #       # Should be quick enough
+    #       while(True):
+    #           exclusion = list(set(range(len(self.dataset))) - set([index]))
+    #           exclusion = random.choice(exclusion)
+    #           if self.dataset[exclusion]['label'] != label:
+    #               sequence, negativeLabel = self.dataset[exclusion]['paths'], self.dataset[exclusion]['label']
+    #               negative, _ = self.choose(sequence, self.maxSequenceLength)
+    #               negative = [os.path.join(self.topDir, image) for image in negative]
+    #               negative = [self.loadImage(path) for path in negative]
+    #               break
+    #       return torch.stack(negative), torch.stack(anchor), torch.stack(positive), label, negativeLabel
+    #     else:
+    #       anchor = [os.path.join(self.topDir, image) for image in sequence]
+    #       anchor = [self.loadImage(path) for path in anchor]
+
+    #       # It is assumed that a sequences has single class
+    #       # label = numpy.asarray([1]) * int(label)
+    #       # label = torch.from_numpy(label).long()
+    #       return torch.stack(anchor), label
