@@ -1,5 +1,7 @@
 import os, time, json
 import numpy
+import albumentations
+import albumentations.augmentations.transforms as transforms
 
 import torch
 from torch.utils import data
@@ -165,11 +167,23 @@ class OpenSetCows2021TrackLet(data.Dataset):
     def loadImage(self, path):
         image = self.loadResizeImage(path)
         # Firstly, transform from NHWC -> NCWH
-        image = image.transpose(2, 0, 1)
-        # Now convert into pyTorch form
-        image = torch.from_numpy(image).float() / 255
         if self.transform:
-            image = self.t(image)
+            # Check if the transofrm is albumentations or torchvision
+            if isinstance(self.t, albumentations.core.composition.Compose):
+              image = self.t(image=image)
+              image = image['image']
+              image = image.transpose(2, 0, 1)
+              # Now convert into pyTorch form
+              image = torch.from_numpy(image).float()
+            else:
+              image = image.transpose(2, 0, 1)
+              # Now convert into pyTorch form
+              image = torch.from_numpy(image).float() / 255
+              image = self.t(image)
+        else:
+          image = image.transpose(2, 0, 1)
+          image = torch.from_numpy(image).float() / 255
+          
         return image
     
     def choose(self, choice, N, shuffle=False):
