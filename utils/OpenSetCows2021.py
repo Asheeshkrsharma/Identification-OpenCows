@@ -249,23 +249,29 @@ class OpenSetCows2021TrackLet(data.Dataset):
         if self.maxSequenceLength != None:
             # By chance select a part of the same sequence to make
             # the positive and anchor samples.
-            if random.random() >= self.prob:
-                # Choose different sequences
-                indexPos = self.getSubset(catPos, indexAnchor)
-                _, positive = self.choose(
-                    self.dataset[indexPos]['paths'],
-                    self.maxSequenceLength
-                )
-                anchor, _ = self.choose(
-                    self.dataset[indexAnchor]['paths'],
-                    self.maxSequenceLength
-                )
-                assert indexPos != indexAnchor
-            else:
-                # Choose part of the same sequence
-                sequence = self.dataset[indexAnchor]['paths']
-                anchor, positive = self.choose(
-                    sequence, self.maxSequenceLength, shuffle=True)
+
+            # Choose part of the same sequence
+            sequence = self.dataset[indexAnchor]['paths']
+            anchor, positive = self.choose(
+                sequence, self.maxSequenceLength, shuffle=True)
+
+            # For some reason, this throws an index error sometimes
+            # So we have a try except block.
+            try:
+              if random.random() >= self.prob:
+                  # Choose different sequences
+                  indexPos = self.getSubset(catPos, indexAnchor)
+                  _, positive = self.choose(
+                      self.dataset[indexPos]['paths'],
+                      self.maxSequenceLength
+                  )
+                  anchor, _ = self.choose(
+                      self.dataset[indexAnchor]['paths'],
+                      self.maxSequenceLength
+                  )
+                  assert indexPos != indexAnchor
+            except IndexError:
+              pass
 
             # Next choose a negative sample
             sequence = self.dataset[indexNeg]['paths']
