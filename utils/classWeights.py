@@ -9,6 +9,9 @@ class ClassWeights():
             self.weights = self.get_class_weights_INS(y, numClass, beta=beta, normalise=normalise)
         if strategy == 'ISNS':
             self.weights = self.get_class_weights_ISNS(y, numClass, beta=beta, normalise=normalise)
+        if strategy == 'IMF':
+            self.weights = self.get_class_weights_IMF(y, numClass, beta=beta, normalise=normalise)
+
     def __call__(self):
         return self.weights
 
@@ -39,3 +42,13 @@ class ClassWeights():
         if normalise:
             weights /= (numpy.sum(weights) * numclass)
         return weights    
+
+    # Inverse median frequency weighting
+    def get_class_weights_IMF(y, numclass, beta=0.9, normalise=False): 
+        # Get class weights (inverse frequency) from training labels 
+        classes = numpy.asarray(y)
+        weights = numpy.bincount(classes, minlength=numclass)  # occurences per class 
+        weights[weights == 0] = 1  # replace empty bins with 1 
+        weights = 1 / weights  # number of targets per class 
+        weights /= weights.sum()  # normalize 
+        return weights
