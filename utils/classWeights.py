@@ -17,6 +17,7 @@ class ClassWeights():
 
     def get_class_weights_ENS(self, y, numclass, beta=0.9, normalise=False):
         """
+        y = classfrequency
         Get class weights for imbalanced dataset
         """
         effectiveNum = 1.0 - numpy.power(beta, y)
@@ -27,6 +28,7 @@ class ClassWeights():
 
     def get_class_weights_INS(self, y, numclass, beta=0.9, normalise=False):
         """
+        y = classfrequency
         Get class weights for imbalanced dataset
         """
         weights = 1 / (y)
@@ -36,6 +38,7 @@ class ClassWeights():
 
     def get_class_weights_ISNS(self, y, numclass, beta=0.9, normalise=False):
         """
+        y = classfrequency
         Get class weights for imbalanced dataset
         """
         weights = 1 / (numpy.sqrt(y))
@@ -44,7 +47,10 @@ class ClassWeights():
         return weights    
 
     # Inverse median frequency weighting
-    def get_class_weights_IMF(y, numclass, beta=0.9, normalise=False): 
+    def get_class_weights_IMF(self, y, numclass, beta=0.9, normalise=False): 
+        """
+        y = list of labels as is!
+        """
         # Get class weights (inverse frequency) from training labels 
         classes = numpy.asarray(y)
         weights = numpy.bincount(classes, minlength=numclass)  # occurences per class 

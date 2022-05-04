@@ -1,3 +1,4 @@
+import imp
 import os, time, json
 import numpy
 import albumentations
@@ -6,7 +7,7 @@ import albumentations.augmentations.transforms as transforms
 import torch
 from torch.utils import data
 from torchvision import transforms
-
+from utils.classWeights import ClassWeights
 from PIL import Image
 
 import random
@@ -100,8 +101,15 @@ class OpenSetCows2021TrackLet(data.Dataset):
         self.eval = eval
         self.batchSize = batchSize
         with open(jsonPath) as f:
-            files = json.load(f)            
-            self.dataset = files[split]
+            files = json.load(f)
+            # Check if multiple splits were mentioned
+            if isinstance(split, tuple):
+              dataset = []
+              for s in split:
+                dataset += files[s]
+              self.dataset = dataset
+            elif isinstance(split, str):
+              self.dataset = files[split]
             self.lookup = {item['label']:[] for item in self.dataset}
             for i in range(len(self.dataset)):
                 self.lookup[self.dataset[i]['label']].append(i)
@@ -157,6 +165,13 @@ class OpenSetCows2021TrackLet(data.Dataset):
         weights = sum(classFrequency) / (classFrequency * len(self.lookup))
         return weights, classFrequency
 
+    def getClassWeights(self, method, beta=0.9, normalise=False):
+        if method=='IMF':
+            # y is actual the list of all labels in the test train dataset
+            y = [item['label'] for item in self.dataset]
+            return ClassWeights(y,self.numClasses, 'IMF', beta=0.0, normalise=False)()
+        else:
+            return ClassWeights(self.classFrequency, self.numClasses, method, beta=beta, normalise=normalise)()
     # Get the number of items for this dataset (depending on the split)
     def __len__(self):
         if self.eval==True:
