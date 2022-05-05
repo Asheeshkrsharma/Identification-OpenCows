@@ -8,6 +8,7 @@ import torch
 from torch.utils import data
 from torchvision import transforms
 from utils.classWeights import ClassWeights
+from utils.TemporalAlbumentations import TemporalCompose
 from PIL import Image
 
 import random
@@ -236,6 +237,13 @@ class OpenSetCows2021TrackLet(data.Dataset):
 
     def retrieve(self, paths):
         images = [os.path.join(self.topDir, image) for image in paths]
+        # Check if the transforms is a TemporalCompose, in which case
+        # reset the transform parameters. This allows us to have temporally
+        # consistent transforms throughout the sequence
+        if isinstance(self.t, TemporalCompose):
+          # Call precompute to randomise the transformation parameters
+          # This allows us to maintain the temporal aspect of the images
+          self.t.preComputeTransformApplication()          
         return [self.loadImage(path) for path in images]
 
     # Index retrieval method
