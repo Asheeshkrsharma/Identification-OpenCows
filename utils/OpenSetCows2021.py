@@ -38,7 +38,7 @@ class OpenSetCows2021(data.Dataset):
                         if len(paths) > 0:
                             dataSet[split].append({"paths": paths, "sort": indeces})
                             self.flatFiles += paths
-        
+
         self.dataSet = dataSet
         self.t = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
@@ -92,7 +92,7 @@ class OpenSetCows2021(data.Dataset):
 class OpenSetCows2021TrackLet(data.Dataset):
     # Class constructor
     def __init__(
-        self, topDir, jsonPath, batchSize=0, split='train', eval=False, trackletChoiceProb = 0.5, maxSequenceLength=None, combine=False, transform=None, img_size=(224, 224)
+        self, topDir, jsonPath, batchSize=0, split='train', eval=False, trackletChoiceProb = 0.5, maxSequenceLength=None, combine=False, transform=None, returnPath=False , img_size=(224, 224)
     ):
         self.img_size = img_size
         self.maxSequenceLength = maxSequenceLength
@@ -101,6 +101,8 @@ class OpenSetCows2021TrackLet(data.Dataset):
         self.prob = trackletChoiceProb
         self.eval = eval
         self.batchSize = batchSize
+        self.returnPath = returnPath
+
         with open(jsonPath) as f:
             files = json.load(f)
             # Check if multiple splits were mentioned
@@ -179,7 +181,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
             return len(self.dataset)
         else:
             return max(len(self.lookup), self.batchSize)
-    
+
     def loadImage(self, path):
         image = self.loadResizeImage(path)
         # Firstly, transform from NHWC -> NCWH
@@ -199,9 +201,9 @@ class OpenSetCows2021TrackLet(data.Dataset):
         else:
           image = image.transpose(2, 0, 1)
           image = torch.from_numpy(image).float() / 255
-          
+
         return image
-    
+
     def choose(self, choice, N, shuffle=False):
         # There can be a case where, Length of the sequence
         # is less than N. In that case, our strategy would
@@ -220,7 +222,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
             X = random.randint(N, S)
           anchor = [choice[i % L] if (i % L)<L else None for i in range(X, X+N)]
           positive = [choice[i % L] if (i % L)<L else None for i in range(X-N, X)]
-        
+
         if shuffle == True:
             random.shuffle(positive)
         return anchor, positive
@@ -230,7 +232,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
         candidates = list(set(candidates) - set([index]))
         # Some categories might have just one sequence.
         if len(candidates) > 0:
-          candidates = random.choice(candidates) 
+          candidates = random.choice(candidates)
         else:
           candidates = random.choice(self.lookup[category])
         return candidates
@@ -243,7 +245,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
         if isinstance(self.t, TemporalCompose):
           # Call precompute to randomise the transformation parameters
           # This allows us to maintain the temporal aspect of the images
-          self.t.preComputeTransformApplication()          
+          self.t.preComputeTransformApplication()
         return [self.loadImage(path) for path in images]
 
     # Index retrieval method
@@ -254,7 +256,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
         try:
             catPos, catNeg = categories
             # Choose from indeces of a class in the dataset
-            indexAnchor = random.choice(self.lookup[catPos]) 
+            indexAnchor = random.choice(self.lookup[catPos])
             indexNeg = random.choice(self.lookup[catNeg])
         except TypeError as te:
             # Probably we are evaluating, in that case,
@@ -313,7 +315,10 @@ class OpenSetCows2021TrackLet(data.Dataset):
             sequence = self.dataset[indexAnchor]['paths']
             anchor = [os.path.join(self.topDir, image) for image in sequence]
             anchor = [self.loadImage(path) for path in anchor]
-            return torch.stack(anchor), catPos
+            if self.returnPath:
+              return torch.stack(anchor), catPos, sequence
+            else:
+              return torch.stack(anchor), catPos
 
     # Index retrieval method
     # def __getitem__(self, index):
@@ -328,7 +333,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
     #     if self.maxSequenceLength != None:
     #       # Get a random yet temporally contgious set of images.
     #       anchor, positive = self.choose(sequence, self.maxSequenceLength)
-          
+
     #       if random.random() < self.prob:
     #             try:
     #               positiveTemp = self.getSubset(label, index)
