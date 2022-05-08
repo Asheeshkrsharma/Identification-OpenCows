@@ -1,14 +1,9 @@
 .ipynb_checkpoints/
 datasets/
 download/
-
-./visualisations/stats.html
-./visualisations/.DS_Store
-./visualisations/node_modules
-./visualisations/public/bundle.*
-./visualisations/public/bundle-supplement.*
-./visualisations/public/*.html
-./visualisations/stats.html
+viz/demo_build
+viz/node_modules
+viz/webpack/*.ts
 
 # Compiled source #
 ###################

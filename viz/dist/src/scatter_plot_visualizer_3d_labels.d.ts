@@ -1,0 +1,34 @@
+import * as THREE from 'three';
+import { ScatterPlotVisualizer } from './scatter_plot_visualizer';
+import { RenderContext } from './render';
+import { Styles } from './styles';
+export declare class ScatterPlotVisualizer3DLabels implements ScatterPlotVisualizer {
+    private styles;
+    id: string;
+    private scene;
+    private labelStrings;
+    private geometry;
+    private worldSpacePointPositions;
+    private pickingColors;
+    private renderColors;
+    private material;
+    private uniforms;
+    private labelsMesh;
+    private positions;
+    private totalVertexCount;
+    private labelVertexMap;
+    private glyphTexture;
+    constructor(styles: Styles);
+    private createGlyphTexture;
+    private processLabelVerts;
+    private createColorBuffers;
+    private createLabels;
+    private colorLabels;
+    setScene(scene: THREE.Scene): void;
+    dispose(): void;
+    onPickingRender(rc: RenderContext): void;
+    onRender(rc: RenderContext): void;
+    onPointPositionsChanged(newPositions: Float32Array): void;
+    setLabelStrings(labelStrings: string[]): void;
+    onResize(newWidth: number, newHeight: number): void;
+}
