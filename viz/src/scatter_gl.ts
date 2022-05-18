@@ -63,7 +63,7 @@ export class ScatterGL {
   private containerElement: HTMLElement;
   private dataset?: Dataset;
   private pointColorer: PointColorer | null = null;
-  private scatterPlot: ScatterPlot;
+  public scatterPlot: ScatterPlot;
   private sequences: Sequence[] = [];
   private styles: Styles;
 
@@ -75,7 +75,7 @@ export class ScatterGL {
   /* Visualizers, maintained by ScatterGL but used by ScatterPlot */
   private canvasLabelsVisualizer?: ScatterPlotVisualizerCanvasLabels;
   private labels3DVisualizer?: ScatterPlotVisualizer3DLabels;
-  private pointVisualizer?: ScatterPlotVisualizerSprites;
+  public pointVisualizer?: ScatterPlotVisualizerSprites;
   private polylineVisualizer?: ScatterPlotVisualizerPolylines;
   private spritesheetVisualizer?: ScatterPlotVisualizerSprites;
 
@@ -107,7 +107,7 @@ export class ScatterGL {
     this.scatterPlot.onCameraMove(this.cameraMoveCallback);
   }
 
-  private setParameters(p: ScatterGLParams) {
+  public setParameters(p: ScatterGLParams) {
     if (p.onClick !== undefined) this.clickCallback = p.onClick;
     if (p.onHover !== undefined) this.hoverCallback = p.onHover;
     if (p.onSelect !== undefined) this.selectCallback = p.onSelect;

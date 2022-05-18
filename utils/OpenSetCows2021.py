@@ -186,6 +186,8 @@ class OpenSetCows2021TrackLet(data.Dataset):
         image = self.loadResizeImage(path)
         # Firstly, transform from NHWC -> NCWH
         if self.transform:
+            # Check if albumentations.normalize is being used
+            hasNormalize = sum([isinstance(t, albumentations.Normalize) for t in list(self.t)]) == 1
             # Check if the transofrm is albumentations or torchvision
             if isinstance(self.t, albumentations.core.composition.Compose):
               image = self.t(image=image)
@@ -193,6 +195,8 @@ class OpenSetCows2021TrackLet(data.Dataset):
               image = image.transpose(2, 0, 1)
               # Now convert into pyTorch form
               image = torch.from_numpy(image).float()
+              if not hasNormalize:
+                image /= 255.
             else:
               image = image.transpose(2, 0, 1)
               # Now convert into pyTorch form

@@ -122,12 +122,12 @@ export class ScatterPlot {
   private pickingTexture = new THREE.WebGLRenderTarget(0, 0);
   private light: THREE.PointLight;
 
-  private camera!: THREE.Camera;
+  public camera!: THREE.Camera;
   private orbitAnimationOnNextCameraCreation: boolean = false;
   private orbitCameraControls: any;
   private orbitAnimationId: number | null = null;
 
-  private worldSpacePointPositions = new Float32Array(0);
+  public worldSpacePointPositions = new Float32Array(0);
   private pointColors = new Float32Array(0);
   private pointScaleFactors = new Float32Array(0);
   private labels?: LabelRenderParams;
@@ -737,6 +737,7 @@ export class ScatterPlot {
 
   /** Update scatter plot with a new array of packed xyz point positions. */
   setPointPositions(worldSpacePointPositions: Float32Array) {
+    
     this.worldSpacePointPositions = worldSpacePointPositions;
     this.visualizers.forEach(v =>
       v.onPointPositionsChanged(worldSpacePointPositions)

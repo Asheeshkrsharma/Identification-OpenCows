@@ -4,6 +4,8 @@ download/
 viz/demo_build
 viz/node_modules
 viz/webpack/*.ts
+viz/package-lock.json
+viz/yarn.lock
 
 # Compiled source #
 ###################

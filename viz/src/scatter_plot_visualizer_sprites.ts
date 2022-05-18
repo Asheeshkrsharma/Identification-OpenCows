@@ -136,7 +136,8 @@ const FRAGMENT_SHADER = `
         // Coordinates of the vertex within the entire sprite image.
         vec2 coords =
           (gl_PointCoord + xyIndex) / vec2(spritesPerRow, spritesPerColumn);
-        gl_FragColor = vColor * texture(spriteTexture, coords);
+        // gl_FragColor = vColor * texture(spriteTexture, coords);
+        gl_FragColor = texture(spriteTexture, coords);
       } else {
         float alpha = 1.;
         if (int(shapeIdx) != 1) {
@@ -144,7 +145,7 @@ const FRAGMENT_SHADER = `
           float r = 0., delta = 0.;
           vec2 centerToP = 2.0 * gl_PointCoord - 1.0;
           r = dot(centerToP, centerToP);
-          delta = fwidth(r);
+          delta = fwidth(r) + 0.1;
           alpha = 1.0 - linearstep(0.5 - delta, 0.5 + delta, r);
         } else {
           // Triangle
@@ -155,19 +156,23 @@ const FRAGMENT_SHADER = `
           float p_in_v0_v1 = cross(v1 - v0, p - v0).z;
           float p_in_v1_v2 = cross(v2 - v1, p - v1).z;
           vec2 conditional = vec2(p_in_v0_v1, p_in_v1_v2);
-          vec2 uvPixel = fwidth(conditional);
-          vec2 border = linearstep(vec2(0.0), uvPixel, conditional) *
-          linearstep(vec2(0.), uvPixel, vec2(1) - conditional);
+          vec2 uvPixel = fwidth(conditional) + 0.1;
+          vec2 border = smoothstep(vec2(0.0), uvPixel, conditional) *
+          smoothstep(vec2(0.), uvPixel, vec2(1) - conditional);
           alpha = border.x * border.y;
         }
         gl_FragColor = vColor;
+
+        // Choose alpha based on shape
         if (int(shapeIdx) != 1) {
           gl_FragColor.a = alpha * 0.35;
         } else {
+          gl_FragColor.a = alpha * 0.5;        
           // Create a border by mixing the label color with black based on alpha
-          gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.), 1. - smoothstep(0., 1., alpha));
-          gl_FragColor.a = alpha * 0.5;
-        }
+          if (alpha > 0. && alpha < 0.9) {
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(38. / 255.), smoothstep(1., 0.5, alpha));
+          }          
+        }      
       }
     }`;
 
@@ -200,7 +205,7 @@ const FRAGMENT_SHADER_PICKING = `
 export class ScatterPlotVisualizerSprites implements ScatterPlotVisualizer {
   public id = 'SPRITES';
 
-  private scene!: THREE.Scene;
+  public scene!: THREE.Scene;
   private fog!: THREE.Fog;
   private texture!: THREE.Texture;
 
@@ -456,7 +461,6 @@ export class ScatterPlotVisualizerSprites implements ScatterPlotVisualizer {
         this.disposeGeometry();
       }
     }
-
     this.worldSpacePointPositions = newPositions;
 
     if (this.points == null) {

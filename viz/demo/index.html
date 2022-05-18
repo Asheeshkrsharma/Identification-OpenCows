@@ -43,6 +43,8 @@ limitations under the License.
         top: 0;
         left: 0;
         padding: 10px;
+        background-color: white;
+        height: 100vh;
       }
 
       #switch-3D {
@@ -61,9 +63,9 @@ limitations under the License.
         width: 100px;
       }
     </style>
+
   </head>
   <body>
-    <div id="container"></div>
     <div id="controls">
       <div class="interactions control">
         <h5>Controls</h5>
@@ -89,22 +91,22 @@ limitations under the License.
           <span class="mdl-radio__label">Select</span>
         </label>
       </div>
-      <div class="button control">
+      <!-- <div class="button control">
         <button
           id="select-random"
           class="mdl-button mdl-js-button mdl-button--raised"
         >
           Select random
         </button>
-      </div>
-      <div class="button control">
+      </div> -->
+      <!-- <div class="button control">
         <button
           id="toggle-orbit"
           class="mdl-button mdl-js-button mdl-button--raised"
         >
           Toggle Orbit
         </button>
-      </div>
+      </div> -->
       <hr />
       <div class="render-modes control">
         <h5>Render</h5>
@@ -129,7 +131,7 @@ limitations under the License.
           />
           <span class="mdl-radio__label">Sprites</span>
         </label>
-        <label class="mdl-radio mdl-js-radio" for="text-render">
+        <!-- <label class="mdl-radio mdl-js-radio" for="text-render">
           <input
             type="radio"
             class="mdl-radio__button"
@@ -138,8 +140,8 @@ limitations under the License.
             value="text"
           />
           <span class="mdl-radio__label">Text</span>
-        </label>
-        <div id="switch-3D">
+        </label> -->
+        <!-- <div id="switch-3D">
           <label class="mdl-switch mdl-js-switch" for="dimensions-render">
             <input
               type="checkbox"
@@ -161,7 +163,7 @@ limitations under the License.
             />
             <span class="mdl-switch__label">Sequences</span>
           </label>
-        </div>
+        </div> -->
       </div>
       <div class="color control">
         <h5>Color by</h5>
@@ -190,5 +192,6 @@ limitations under the License.
       <hr />
       <div id="messages"></div>
     </div>
+    <div id="container"></div>
   </body>
 </html>

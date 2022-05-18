@@ -37,6 +37,9 @@
     "webpack-dev-server": "^3.4.1"
   },
   "dependencies": {
+    "jstat": "^1.9.5",
+    "mathjs": "^10.5.3",
+    "numeric": "^1.2.6",
     "three": "0.125"
   },
   "prettier": {
