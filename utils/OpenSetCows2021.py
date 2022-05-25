@@ -257,6 +257,7 @@ class OpenSetCows2021TrackLet(data.Dataset):
         # Sampler is going to return a tuple of category
         # We have to get a random index for each category
         # in the dataset
+        mixingSampleIdx = None
         try:
             catPos, catNeg = categories
             # Choose from indeces of a class in the dataset
@@ -277,6 +278,13 @@ class OpenSetCows2021TrackLet(data.Dataset):
             # And choose any random negative category
             catNeg = random.choice(list(set(range(len(self.lookup))) - set([catPos])))
             indexNeg = random.choice(self.lookup[catNeg])
+        
+        # Get one more index to mix up the sequences.
+        if random.random() >= 0.1:
+          while True:
+            mixingSampleIdx = random.choice(self.lookup[catPos])
+            if mixingSampleIdx != indexAnchor:
+              break
 
         # If max sequence length is specified, we are training
         if self.maxSequenceLength != None:
@@ -302,6 +310,14 @@ class OpenSetCows2021TrackLet(data.Dataset):
                 sequence = self.dataset[indexAnchor]['paths']
                 anchor, positive = self.choose(
                     sequence, self.maxSequenceLength, shuffle=True)
+
+            # Mix with the mixing sequence
+            if mixingSampleIdx is not None:
+              mixingSequence = self.dataset[mixingSampleIdx]['paths']
+              a, b = self.choose(
+                    mixingSequence, self.maxSequenceLength, shuffle=True)
+              anchor = random.choices(anchor+a, k=self.maxSequenceLength)
+              positive = random.choices(positive+b, k=self.maxSequenceLength)
 
             # Next choose a negative sample
             sequence = self.dataset[indexNeg]['paths']
